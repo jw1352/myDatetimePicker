@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/txtDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="2015-12-11"
+        android:background="#ffffff"
+        android:textColor="#626262"
+        android:textSize="18dp" />
+
+    <LinearLayout
+        android:layout_below="@+id/txtDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <wei.jiang.datepicker.view.WheelView
+            android:id="@+id/wvYear"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+        </wei.jiang.datepicker.view.WheelView>
+
+        <wei.jiang.datepicker.view.WheelView
+            android:id="@+id/wvMonth"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+        </wei.jiang.datepicker.view.WheelView>
+
+        <wei.jiang.datepicker.view.WheelView
+            android:id="@+id/wvDay"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+        </wei.jiang.datepicker.view.WheelView>
+
+        <wei.jiang.datepicker.view.WheelView
+            android:id="@+id/wvHour"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+        </wei.jiang.datepicker.view.WheelView>
+
+        <wei.jiang.datepicker.view.WheelView
+            android:id="@+id/wvMinute"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+        </wei.jiang.datepicker.view.WheelView>
+
+    </LinearLayout>
+
+    <View
+        android:layout_below="@+id/txtDate"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="70dp"
+        android:background="#E1E1E1" />
+
+    <LinearLayout
+        android:layout_below="@+id/txtDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="76dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="5dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:paddingLeft="60dp"
+            android:text="年"
+            android:textColor="#E75A3E"
+            android:textSize="16dp" />
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingLeft="40dp"
+            android:text="月"
+            android:textColor="#E75A3E"
+            android:textSize="16dp" />
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingLeft="40dp"
+            android:text="日"
+            android:textColor="#E75A3E"
+            android:textSize="16dp" />
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingLeft="42dp"
+            android:text="时"
+            android:textColor="#E75A3E"
+            android:textSize="16dp" />
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+
+            android:layout_weight="1"
+            android:gravity="center"
+            android:paddingLeft="40dp"
+            android:text="分"
+            android:textColor="#E75A3E"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <View
+        android:layout_below="@+id/txtDate"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginTop="105dp"
+        android:background="#E1E1E1" />
+
+
+</RelativeLayout>

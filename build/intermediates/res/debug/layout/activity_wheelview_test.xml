@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <wei.jiang.datepicker.view.WheelView
+        android:id="@+id/wheelView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </wei.jiang.datepicker.view.WheelView>
+
+</LinearLayout><!-- From: file:/D:/Android/MyApplication/myDatetimeDialog/src/main/res/layout/activity_wheelview_test.xml -->

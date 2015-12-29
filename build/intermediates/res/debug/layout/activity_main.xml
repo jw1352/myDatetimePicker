@@ -1,0 +1,26 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <wei.jiang.datepicker.view.MyDateTimePicker
+        android:id="@+id/dateTimePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"></wei.jiang.datepicker.view.MyDateTimePicker>
+
+    <Button
+        android:id="@+id/alertBtn"
+        android:onClick="alert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dateTimePicker"
+        android:text="弹框" />
+
+    <TextView
+        android:layout_below="@id/alertBtn"
+        android:id="@+id/txtDateTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
+<!-- From: file:/D:/Android/MyApplication/myDatetimeDialog/src/main/res/layout/activity_main.xml -->

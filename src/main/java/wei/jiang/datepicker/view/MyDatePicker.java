@@ -2,6 +2,7 @@ package wei.jiang.datepicker.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -56,8 +57,8 @@ public class MyDatePicker extends FrameLayout {
                 true);
 
         mCalendar = Calendar.getInstance();
-        int year = mCalendar.get(Calendar.YEAR);
-        int month = mCalendar.get(Calendar.MONTH);
+        final int year = mCalendar.get(Calendar.YEAR);
+        final int month = mCalendar.get(Calendar.MONTH);
         final int day = mCalendar.get(Calendar.DATE);
         list_big = Arrays.asList(months_big);
         list_little = Arrays.asList(months_little);
@@ -68,27 +69,39 @@ public class MyDatePicker extends FrameLayout {
         wvYear = (WheelView) findViewById(R.id.wvYear);
         WheelViewAdapter adapterYear = new WheelViewAdapter(startYear, endYear, context);
         wvYear.setAdapter(adapterYear);
-        wvYear.setCurrentItem(year - startYear + (endYear - startYear + 1) * 5); //设置到中间位置实现循环滑动
+
+        wvYear.post(new Runnable() {
+            @Override
+            public void run() {
+                wvYear.setCurrentItem(year - startYear, year);
+            }
+        });
 
         wvMonth = (WheelView) findViewById(R.id.wvMonth);
         WheelViewAdapter adapterMonth = new WheelViewAdapter(1, 12, context);
         wvMonth.setAdapter(adapterMonth);
-        wvMonth.setCurrentItem(month + 12 * 5);  //设置到中间位置实现循环滑动
+
+        wvMonth.post(new Runnable() {
+            @Override
+            public void run() {
+                wvMonth.setCurrentItem(month, month + 1);
+            }
+        });
 
         wvDay = (WheelView) findViewById(R.id.wvDay);
         final WheelViewAdapter adapterDay = new WheelViewAdapter(1, 31, context);
         wvDay.setAdapter(adapterDay);
-        changeDayItem(year, month, day, context, adapterDay);
+        changeDayItem(year, month + 1, day, context, adapterDay); //月份天数要加1
 
 
         wvYear.setOnItemChangedListener(new WheelView.OnItemChangedListener() {
             @Override
             public void onItemSelected(int value) {
-                changeDayItem(value, wvMonth.getCurrentValue(), wvDay.getCurrentValue(), context, adapterDay);
+                int day = changeDayItem(value, wvMonth.getCurrentValue(), wvDay.getCurrentValue(), context, adapterDay);
                 //月份是从0开始， 格式化时要减一
-                txtDate.setText(formatDate(value, wvMonth.getCurrentValue() - 1, wvDay.getCurrentValue()));
+                txtDate.setText(formatDate(value, wvMonth.getCurrentValue() - 1, day));
                 if (onTimeSetListener != null) {
-                    onTimeSetListener.onTimeSet(value, wvMonth.getCurrentValue() - 1, wvDay.getCurrentValue());
+                    onTimeSetListener.onTimeSet(value, wvMonth.getCurrentValue() - 1, day);
                 }
             }
         });
@@ -96,14 +109,16 @@ public class MyDatePicker extends FrameLayout {
         wvMonth.setOnItemChangedListener(new WheelView.OnItemChangedListener() {
             @Override
             public void onItemSelected(int value) {
-                changeDayItem(wvYear.getCurrentValue(), value, wvDay.getCurrentValue(), context, adapterDay);
-
-                txtDate.setText(formatDate(wvYear.getCurrentValue(), value - 1, wvDay.getCurrentValue()));
+                Log.d("xx", wvDay.getCurrentValue() + "");
+                int day = changeDayItem(wvYear.getCurrentValue(), value, wvDay.getCurrentValue(), context, adapterDay);
+                txtDate.setText(formatDate(wvYear.getCurrentValue(), value - 1, day));
+                Log.d("yy", wvDay.getCurrentValue() + "");
                 if (onTimeSetListener != null) {
-                    onTimeSetListener.onTimeSet(wvYear.getCurrentValue(), value - 1, wvDay.getCurrentValue());
+                    onTimeSetListener.onTimeSet(wvYear.getCurrentValue(), value - 1, day);
                 }
             }
         });
+
 
         wvDay.setOnItemChangedListener(new WheelView.OnItemChangedListener() {
             @Override
@@ -128,7 +143,7 @@ public class MyDatePicker extends FrameLayout {
      * @param context
      * @param adapterDay
      */
-    private void changeDayItem(int year, int month, int day, Context context, WheelViewAdapter adapterDay) {
+    private int changeDayItem(int year, int month, int day, Context context, WheelViewAdapter adapterDay) {
         int maxDay;
         if (list_big
                 .contains(String.valueOf(month))) {
@@ -146,7 +161,20 @@ public class MyDatePicker extends FrameLayout {
         }
         adapterDay.setMaxValue(maxDay);
         adapterDay.notifyDataSetChanged();
-        wvDay.setCurrentItem(day - 1 + maxDay * 5);
+
+        final int temp;
+        if (day > maxDay) {
+            temp = maxDay;
+        } else {
+            temp = day;
+        }
+        wvDay.post(new Runnable() {
+            @Override
+            public void run() {
+                wvDay.setCurrentItem(temp - 1, temp);
+            }
+        });
+        return temp;
     }
 
     private interface OnTimeSetListener {

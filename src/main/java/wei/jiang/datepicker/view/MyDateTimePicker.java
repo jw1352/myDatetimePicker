@@ -69,11 +69,11 @@ public class MyDateTimePicker extends FrameLayout {
                 true);
 
         mCalendar = Calendar.getInstance();
-        int year = mCalendar.get(Calendar.YEAR);
-        int month = mCalendar.get(Calendar.MONTH);
+        final int year = mCalendar.get(Calendar.YEAR);
+        final int month = mCalendar.get(Calendar.MONTH);
         final int day = mCalendar.get(Calendar.DATE);
-        int hour = mCalendar.get(Calendar.HOUR_OF_DAY);
-        int minute = mCalendar.get(Calendar.MINUTE);
+        final int hour = mCalendar.get(Calendar.HOUR_OF_DAY);
+        final int minute = mCalendar.get(Calendar.MINUTE);
         crruentDate = mCalendar.getTime();
 
         list_big = Arrays.asList(months_big);
@@ -85,38 +85,57 @@ public class MyDateTimePicker extends FrameLayout {
         wvYear = (WheelView) findViewById(R.id.wvYear);
         WheelViewAdapter adapterYear = new WheelViewAdapter(startYear, endYear, context);
         wvYear.setAdapter(adapterYear);
-        wvYear.setCurrentItem(year - startYear + (endYear - startYear + 1) * 5); //设置到中间位置实现循环滑动
+        wvYear.post(new Runnable() {
+            @Override
+            public void run() {
+                wvYear.setCurrentItem(year - startYear, year); //设置到中间位置实现循环滑动
+            }
+        });
 
         wvMonth = (WheelView) findViewById(R.id.wvMonth);
         WheelViewAdapter adapterMonth = new WheelViewAdapter(1, 12, context);
         wvMonth.setAdapter(adapterMonth);
-        wvMonth.setCurrentItem(month + 12 * 5);  //设置到中间位置实现循环滑动
+        wvMonth.post(new Runnable() {
+            @Override
+            public void run() {
+                wvMonth.setCurrentItem(month, month + 1);
+            }
+        });
 
         wvDay = (WheelView) findViewById(R.id.wvDay);
         final WheelViewAdapter adapterDay = new WheelViewAdapter(1, 31, context);
         wvDay.setAdapter(adapterDay);
-        changeDayItem(year, month, day, context, adapterDay);
+        changeDayItem(year, month - 1, day, context, adapterDay);
 
         wvHour = (WheelView) findViewById(R.id.wvHour);
         WheelViewAdapter adapterHour = new WheelViewAdapter(0, 23, context);
         wvHour.setAdapter(adapterHour);
-        Log.d("dd", "" + hour);
-        wvHour.setCurrentItem(hour + 24 * 5); //设置到中间位置实现循环滑动
+        wvHour.post(new Runnable() {
+            @Override
+            public void run() {
+                wvHour.setCurrentItem(hour, hour);
+            }
+        });
 
         wvMinute = (WheelView) findViewById(R.id.wvMinute);
-        WheelViewAdapter adapterMinute = new WheelViewAdapter(0, 60, context);
+        WheelViewAdapter adapterMinute = new WheelViewAdapter(1, 60, context);
         wvMinute.setAdapter(adapterMinute);
-        wvMinute.setCurrentItem(minute + 12 * 5);  //设置到中间位置实现循环滑动
+        wvMinute.post(new Runnable() {
+            @Override
+            public void run() {
+                wvMinute.setCurrentItem(minute - 1, minute);
+            }
+        });
 
 
         wvYear.setOnItemChangedListener(new WheelView.OnItemChangedListener() {
             @Override
             public void onItemSelected(int value) {
-                changeDayItem(value, wvMonth.getCurrentValue(), wvDay.getCurrentValue(), context, adapterDay);
+                int day = changeDayItem(value, wvMonth.getCurrentValue(), wvDay.getCurrentValue(), context, adapterDay);
                 //月份是从0开始， 格式化时要减一
-                txtDate.setText(formatDate(value, wvMonth.getCurrentValue() - 1, wvDay.getCurrentValue(), wvHour.getCurrentValue(), wvMinute.getCurrentValue()));
+                txtDate.setText(formatDate(value, wvMonth.getCurrentValue() - 1, day, wvHour.getCurrentValue(), wvMinute.getCurrentValue()));
                 if (onTimeSetListener != null) {
-                    onTimeSetListener.onTimeSet(value, wvMonth.getCurrentValue() - 1, wvDay.getCurrentValue(), wvHour.getCurrentValue(), wvMinute.getCurrentValue());
+                    onTimeSetListener.onTimeSet(value, wvMonth.getCurrentValue() - 1, day, wvHour.getCurrentValue(), wvMinute.getCurrentValue());
                 }
             }
         });
@@ -124,11 +143,11 @@ public class MyDateTimePicker extends FrameLayout {
         wvMonth.setOnItemChangedListener(new WheelView.OnItemChangedListener() {
             @Override
             public void onItemSelected(int value) {
-                changeDayItem(wvYear.getCurrentValue(), value, wvDay.getCurrentValue(), context, adapterDay);
+                int day = changeDayItem(wvYear.getCurrentValue(), value, wvDay.getCurrentValue(), context, adapterDay);
 
-                txtDate.setText(formatDate(wvYear.getCurrentValue(), value - 1, wvDay.getCurrentValue(), wvHour.getCurrentValue(), wvMinute.getCurrentValue()));
+                txtDate.setText(formatDate(wvYear.getCurrentValue(), value - 1, day, wvHour.getCurrentValue(), wvMinute.getCurrentValue()));
                 if (onTimeSetListener != null) {
-                    onTimeSetListener.onTimeSet(wvYear.getCurrentValue() , value, wvDay.getCurrentValue()- 1, wvHour.getCurrentValue(), wvMinute.getCurrentValue());
+                    onTimeSetListener.onTimeSet(wvYear.getCurrentValue() , value - 1, day, wvHour.getCurrentValue(), wvMinute.getCurrentValue());
                 }
             }
         });
@@ -178,7 +197,7 @@ public class MyDateTimePicker extends FrameLayout {
      * @param context
      * @param adapterDay
      */
-    private void changeDayItem(int year, int month, int day, Context context, WheelViewAdapter adapterDay) {
+    private int changeDayItem(int year, int month, int day, Context context, WheelViewAdapter adapterDay) {
         int maxDay;
         if (list_big
                 .contains(String.valueOf(month))) {
@@ -196,7 +215,20 @@ public class MyDateTimePicker extends FrameLayout {
         }
         adapterDay.setMaxValue(maxDay);
         adapterDay.notifyDataSetChanged();
-        wvDay.setCurrentItem(day - 1 + maxDay * 5);
+
+        final int temp;
+        if (day > maxDay) {
+            temp = maxDay;
+        } else {
+            temp = day;
+        }
+        wvDay.post(new Runnable() {
+            @Override
+            public void run() {
+                wvDay.setCurrentItem(temp - 1, temp);
+            }
+        });
+        return temp;
     }
 
     private interface OnTimeSetListener {

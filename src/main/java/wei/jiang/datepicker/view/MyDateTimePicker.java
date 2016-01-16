@@ -105,7 +105,7 @@ public class MyDateTimePicker extends FrameLayout {
         wvDay = (WheelView) findViewById(R.id.wvDay);
         final WheelViewAdapter adapterDay = new WheelViewAdapter(1, 31, context);
         wvDay.setAdapter(adapterDay);
-        changeDayItem(year, month - 1, day, context, adapterDay);
+        changeDayItem(year, month + 1, day, context, adapterDay);
 
         wvHour = (WheelView) findViewById(R.id.wvHour);
         WheelViewAdapter adapterHour = new WheelViewAdapter(0, 23, context);

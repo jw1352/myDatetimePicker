@@ -45,8 +45,8 @@ public class MyTimePicker extends FrameLayout {
                 true);
 
         mCalendar = Calendar.getInstance();
-        int hour = mCalendar.get(Calendar.HOUR_OF_DAY);
-        int minute = mCalendar.get(Calendar.MINUTE);
+        final int hour = mCalendar.get(Calendar.HOUR);
+        final int minute = mCalendar.get(Calendar.MINUTE);
 
         txtTime = (TextView) findViewById(R.id.txtTime);
         txtTime.setText(formatDate(hour, minute));
@@ -54,13 +54,23 @@ public class MyTimePicker extends FrameLayout {
         wvHour = (WheelView) findViewById(R.id.wvHour);
         WheelViewAdapter adapterHour = new WheelViewAdapter(0, 23, context);
         wvHour.setAdapter(adapterHour);
-        Log.d("dd", ""+ hour);
-        wvHour.setCurrentItem(hour + 24 * 5); //设置到中间位置实现循环滑动
+        wvHour.post(new Runnable() {
+            @Override
+            public void run() {
+                wvHour.setCurrentItem(hour, hour); //设置到中间位置实现循环滑动
+            }
+        });
 
         wvMinute = (WheelView) findViewById(R.id.wvMinute);
-        WheelViewAdapter adapterMinute = new WheelViewAdapter(0, 60, context);
+        WheelViewAdapter adapterMinute = new WheelViewAdapter(1, 60, context);
         wvMinute.setAdapter(adapterMinute);
-        wvMinute.setCurrentItem(minute + 12 * 5);  //设置到中间位置实现循环滑动
+        wvMinute.post(new Runnable() {
+            @Override
+            public void run() {
+                wvMinute.setCurrentItem(minute - 1, minute - 1);  //设置到中间位置实现循环滑动
+            }
+        });
+
 
 
 
@@ -74,6 +84,7 @@ public class MyTimePicker extends FrameLayout {
                 }
             }
         });
+
 
         wvMinute.setOnItemChangedListener(new WheelView.OnItemChangedListener() {
             @Override

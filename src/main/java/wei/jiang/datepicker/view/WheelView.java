@@ -3,12 +3,11 @@ package wei.jiang.datepicker.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
+import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.Scroller;
 import android.widget.TextView;
 
 /**
@@ -21,9 +20,10 @@ public class WheelView extends ListView implements AbsListView.OnScrollListener 
     private boolean isFirst = true;
 
     private int currentValue;
+    private int firstPostion;
 
     private OnItemChangedListener onItemChangedListener;
-    private boolean isIdle = false;
+    private boolean isIdle;
 
     public void setOnItemChangedListener(WheelView.OnItemChangedListener onItemChangedListener) {
         this.onItemChangedListener = onItemChangedListener;
@@ -31,15 +31,12 @@ public class WheelView extends ListView implements AbsListView.OnScrollListener 
 
     public WheelView(Context context) {
         super(context);
-        initView(context);
+        setOnScrollListener(this);
+        setVerticalScrollBarEnabled(false);
     }
 
     public WheelView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initView(context);
-    }
-
-    private void initView(Context context) {
         setOnScrollListener(this);
         setVerticalScrollBarEnabled(false);
     }
@@ -52,17 +49,9 @@ public class WheelView extends ListView implements AbsListView.OnScrollListener 
             itemHeight = getChildAt(0).getMeasuredHeight();
             setMeasuredDimension(widthMeasureSpec, (itemHeight + getDividerHeight()) * MAX_ITEM_COUNT);
             setDividerHeight(0);
-
-            if (isFirst) { //只在第一次设值
-                currentValue = Integer.parseInt(((TextView) getChildAt(2)).getText().toString());
-                isFirst = false;
-            }
         }
     }
 
-    /**
-     * 自动滑动到顶部位置
-     */
     public void doScroll() {
         final int offsetY = getChildAt(0).getBottom();
         final int distance;
@@ -78,7 +67,7 @@ public class WheelView extends ListView implements AbsListView.OnScrollListener 
             @Override
             public void run() {
                 if (isIdle && distance != 0) {
-                    smoothScrollBy(distance, 400 * Math.abs(distance) / itemHeight); //下滑时取下边一个，可能是滑动方法是异步的
+                    smoothScrollBy(distance, 1000 * Math.abs(distance) / itemHeight); //下滑时取下边一个，可能是滑动方法是异步的
                 }
             }
         }, 100);
@@ -86,6 +75,8 @@ public class WheelView extends ListView implements AbsListView.OnScrollListener 
             onItemChangedListener.onItemSelected(currentValue);
         }
     }
+
+
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -97,10 +88,10 @@ public class WheelView extends ListView implements AbsListView.OnScrollListener 
         }
     }
 
-
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         if (visibleItemCount > 0) {
+            initColor();
             int offsetY = getChildAt(0).getBottom() + getDividerHeight();
             if (offsetY > itemHeight / 2) {// 控制滑过一半改变颜色
                 ((TextView) getChildAt(2)).setTextColor(0xffE75A3E);
@@ -127,17 +118,43 @@ public class WheelView extends ListView implements AbsListView.OnScrollListener 
 
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+
+    private void initColor() {
+        for (int i = 0; i < getChildCount(); i++) {
+            ((TextView) getChildAt(i)).setTextColor(Color.BLACK);
+        }
     }
 
-    public void setCurrentItem(int position) {
-        setSelection(position - 2);
+    /**
+     * 设置初始的位置，放在OnSizeChanged里面执行，不然有问题
+     * @param position 位置
+     * @param value 值
+     */
+    public void setCurrentItem(final int position, int value) {
+        firstPostion = position;
+        currentValue = value;
+        setSelection(firstPostion);
     }
+
 
     public int getCurrentValue() {
         return currentValue;
+    }
+
+    /**
+     * 设置初始位置
+     */
+    private void performFirstSelectedPosition() {
+        if (firstPostion != 0) { //只执行一次
+            this.setSelection(firstPostion);
+            firstPostion = 0;
+        }
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        performFirstSelectedPosition();
     }
 
     public interface OnItemChangedListener {
